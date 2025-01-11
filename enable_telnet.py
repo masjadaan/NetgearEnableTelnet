@@ -20,7 +20,7 @@ signature = MD5(mac + username + SHA256(password) + reserved)
 payload = signature + mac + username + SHA256(password) + reserved
 encryption = Blowfish(payload)
 """
-lib = ctypes.CDLL('../blowfish/libblowfish.so')
+libBlowfish = ctypes.CDLL('../blowfish/libblowfish.so')
 
 # Constants for sizes
 MAC_SIZE = 16
@@ -155,7 +155,7 @@ class PayloadBuilder:
         logging.info(f"Blowfish context initialization...")
         ctx = ctypes.create_string_buffer(256)
         try:
-            lib.Blowfish_Init(ctx, key, len(key))
+            libBlowfish.Blowfish_Init(ctx, key, len(key))
         except Exception as e:
             logging.error(f"Blowfish encryption initialization failed: {e}")
             raise
@@ -169,7 +169,7 @@ class PayloadBuilder:
             # Convert the 8-byte block into two 32-bit integers (xl, xr)
             xl = ctypes.c_uint32(int.from_bytes(block[:HALF_BLOCK_SIZE], byteorder='little'))
             xr = ctypes.c_uint32(int.from_bytes(block[HALF_BLOCK_SIZE:], byteorder='little'))
-            lib.Blowfish_Encrypt(ctx, ctypes.byref(xl), ctypes.byref(xr))
+            libBlowfish.Blowfish_Encrypt(ctx, ctypes.byref(xl), ctypes.byref(xr))
             encrypted_block = xl.value.to_bytes(HALF_BLOCK_SIZE, byteorder='little') + xr.value.to_bytes(HALF_BLOCK_SIZE, byteorder='little')
             encrypted_data.extend(encrypted_block)
 
