@@ -11,6 +11,8 @@ gcc -shared -o libblowfish.so -fPIC blowfish.c
 
 cd ..
 git clone https://github.com/masjadaan/NetgearEnableTelnet.git
+sudo apt install python3-pycryptodome
+# OR in pycharm: pip install pycryptodome
 cd NetgearEnableTelnet
 ./enable_telnet.py -ip <router IP> \
   -port 23 \
